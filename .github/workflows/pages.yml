@@ -1,0 +1,42 @@
+name: Deploy no GitHub Pages
+
+# Publica o jogo (arquivos estáticos) no GitHub Pages via GitHub Actions.
+# Requer que, em Settings > Pages, o "Source" esteja como "GitHub Actions".
+
+on:
+  push:
+    branches:
+      - claude/session-apwh4k
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Raiz do repositório: index.html + src/ + eldoria-standalone.html
+          path: '.'
+
+      - name: Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
