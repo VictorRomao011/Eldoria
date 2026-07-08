@@ -21,9 +21,10 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{width:100%;height:100%;overflow:hidden;background:#05060a;
     font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);
-    user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none;}
+    user-select:none;-webkit-user-select:none;overscroll-behavior:none;}
   canvas{display:block;}
-  #gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;}
+  /* touch-action:none só no canvas do jogo — os menus precisam rolar por toque */
+  #gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;touch-action:none;}
   h1,h2,h3,h4{font-family:'Georgia','Times New Roman',serif;font-weight:700;}
   button{font-family:inherit;cursor:pointer;color:inherit;border:none;background:none;}
   .dim{opacity:.6;} .no{color:#e06a5a;} .ok{color:#7ac06a;}
@@ -411,6 +412,12 @@
     .end-stats{padding:10px;margin:10px 0;font-size:13px;}
   }
 
+  /* Rolagem por toque confiável nos contêineres roláveis (menus/painéis) */
+  #overlay,#loading,#panelBody,.creator,.panel-inner,#dialog{
+    touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  /* elementos de controle não devem rolar a página */
+  #joystick,#joyknob,.abtn{touch-action:none;}
+
   /* Painéis (inventário, mapa, etc.) e diálogos ocupam quase a tela toda no toque */
   @media (hover:none) and (pointer:coarse){
     .panel-inner{max-width:96vw;max-height:92vh;}
@@ -562,13 +569,8 @@
     document.getElementById('panelClose').addEventListener('click', function(){
       if (window.UI) { AUDIO.play('ui'); UI.closePanel(); }
     });
-    /* impedir zoom por gesto duplo-toque no iOS */
-    let lastTouch = 0;
-    document.addEventListener('touchend', function(e){
-      const now = Date.now();
-      if (now - lastTouch < 300) e.preventDefault();
-      lastTouch = now;
-    }, {passive:false});
+    /* zoom por duplo-toque já está desativado pelo viewport (user-scalable=no);
+       não interceptamos touchend aqui para não cancelar cliques nos botões. */
     /* pausar/retomar áudio ao alternar aba */
     document.addEventListener('visibilitychange', function(){
       if (window.AUDIO && AUDIO.ctx){ document.hidden ? AUDIO.ctx.suspend() : AUDIO.ctx.resume(); }

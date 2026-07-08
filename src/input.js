@@ -94,19 +94,34 @@ const CONTROLS = {
     let lid = null, lx = 0, ly = 0;
     const lookZone = document.getElementById('lookzone');
 
+    /* Só controlamos câmera/movimento quando realmente jogando — nunca em
+       menus, painéis ou diálogos (senão o preventDefault bloqueia rolagem/cliques). */
+    const playing = () => G.state === 'play' && !UI.activePanel
+      && document.getElementById('dialog').style.display !== 'flex';
+    /* ignora toques que começam sobre elementos de interface (botões, hotbar, etc.) */
+    const onUI = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      return el && el.closest('button, input, select, textarea, a, .hslot, .inv-item, .swatch, #hud-buttons, #hotbar, #petbar, #panel, #dialog, #overlay');
+    };
+
     const onStart = e => {
+      if (!playing()) return;
       for (const t of e.changedTouches) {
         const x = t.clientX, y = t.clientY;
+        if (onUI(x, y)) continue;
         if (x < innerWidth * 0.45 && y > innerHeight * 0.45 && sid === null) { startJoy(t.identifier, x, y); moveJoy(x, y); }
         else if (x > innerWidth * 0.5 && lid === null) { lid = t.identifier; lx = x; ly = y; }
       }
     };
     const onMove = e => {
+      if (!playing()) return;
+      let handled = false;
       for (const t of e.changedTouches) {
-        if (t.identifier === sid) moveJoy(t.clientX, t.clientY);
-        else if (t.identifier === lid) { INPUT.look.dx += (t.clientX - lx) * 1.6; INPUT.look.dy += (t.clientY - ly) * 1.6; lx = t.clientX; ly = t.clientY; }
+        if (t.identifier === sid) { moveJoy(t.clientX, t.clientY); handled = true; }
+        else if (t.identifier === lid) { INPUT.look.dx += (t.clientX - lx) * 1.6; INPUT.look.dy += (t.clientY - ly) * 1.6; lx = t.clientX; ly = t.clientY; handled = true; }
       }
-      e.preventDefault();
+      /* só bloqueia o comportamento padrão quando de fato estamos movendo joystick/câmera */
+      if (handled) e.preventDefault();
     };
     const onEnd = e => {
       for (const t of e.changedTouches) {
