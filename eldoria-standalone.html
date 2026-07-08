@@ -31,7 +31,8 @@
   ::-webkit-scrollbar-track{background:transparent;}
 
   /* ================= CAMADAS ================= */
-  #overlay,#loading{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+  #overlay,#loading{position:fixed;inset:0;z-index:60;display:none;align-items:safe center;justify-content:safe center;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
     background:radial-gradient(ellipse at center,#1a1420 0%,#08060c 100%);text-align:center;padding:20px;}
   #fade{position:fixed;inset:0;z-index:55;background:#000;opacity:0;pointer-events:none;transition:opacity .7s;}
   #hud{position:fixed;inset:0;z-index:20;display:none;pointer-events:none;}
@@ -380,13 +381,72 @@
     .panel-inner{max-height:94vh;}
     #interact{bottom:44%;}
   }
-  @media (max-width:720px) and (orientation:portrait){
+  @media (max-width:720px) and (orientation:portrait),
+         (hover:none) and (pointer:coarse) and (orientation:portrait){
     #rotate-hint{display:flex !important;}
   }
   #rotate-hint{display:none;position:fixed;inset:0;z-index:70;background:#08060c;
     align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:30px;color:var(--gold2);}
   #rotate-hint .ric{font-size:60px;animation:rothint 2s infinite;}
   @keyframes rothint{0%,100%{transform:rotate(0);}50%{transform:rotate(90deg);}}
+
+  /* ================= RESPONSIVO EXTRA (celular / paisagem) ================= */
+  html,body{overflow-x:hidden;}
+  .creator{max-width:min(720px,96vw);}
+  .creator-body{flex-wrap:wrap;}
+
+  /* Telas baixas (celular em paisagem): encolhe título/criador/finais e permite rolagem */
+  @media (max-height:560px){
+    #overlay{padding:10px;}
+    .title-card{max-width:520px;}
+    .title-logo{font-size:clamp(34px,11vh,80px);letter-spacing:4px;}
+    .title-sub{font-size:clamp(12px,3.4vh,20px);margin:5px 0 12px;letter-spacing:2px;}
+    .title-desc{font-size:clamp(11px,2.6vh,14px);line-height:1.45;margin-bottom:12px;}
+    .title-hint{margin-top:9px;font-size:12px;}
+    .big-btn{padding:11px 18px;font-size:16px;margin:7px auto;max-width:300px;}
+    .creator{padding:14px;}
+    .creator h2{font-size:20px;margin-bottom:10px;}
+    .end-card h1{font-size:clamp(26px,8vh,44px);margin-bottom:10px;}
+    .end-card p{font-size:14px;line-height:1.5;margin-bottom:10px;}
+    .end-stats{padding:10px;margin:10px 0;font-size:13px;}
+  }
+
+  /* Painéis (inventário, mapa, etc.) e diálogos ocupam quase a tela toda no toque */
+  @media (hover:none) and (pointer:coarse){
+    .panel-inner{max-width:96vw;max-height:92vh;}
+    #dialog{width:min(620px,94vw);}
+  }
+
+  /* HUD de toque em PAISAGEM: reorganiza p/ caber tudo sem sobrepor joystick/ações */
+  @media (hover:none) and (pointer:coarse) and (orientation:landscape){
+    #vitals{width:158px;top:8px;left:8px;gap:3px;}
+    .bar{height:11px;}
+    #mm-wrap{top:8px;right:8px;gap:3px;}
+    #minimap{width:94px;height:94px;}
+    #clockbar{padding:3px 8px;font-size:11px;}
+    #questTracker{top:104px;right:8px;width:136px;}
+    /* botões de menu: linha horizontal no topo-centro */
+    #hud-buttons{left:50%;top:6px;bottom:auto;transform:translateX(-50%);
+      flex-direction:row;flex-wrap:nowrap;max-width:none;gap:5px;
+      background:rgba(20,16,28,.45);padding:4px 6px;border-radius:12px;}
+    .hb{width:34px;height:34px;font-size:15px;border-radius:9px;}
+    /* hotbar: centro-baixo, entre joystick e ações */
+    #hotbar{bottom:8px;left:50%;top:auto;right:auto;transform:translateX(-50%);gap:5px;}
+    .hslot{width:42px;height:42px;}.hicon{font-size:19px;}
+    #petbar{bottom:56px;left:50%;top:auto;right:auto;transform:translateX(-50%);}
+    #interact{bottom:38%;}
+    /* joystick e ações compactados p/ tela curta */
+    #joystick{width:104px;height:104px;left:14px;bottom:12px;}
+    #joyknob{width:46px;height:46px;margin:-23px 0 0 -23px;}
+    .act-cluster{width:156px;height:156px;right:10px;bottom:10px;}
+    #btn-attack{width:64px;height:64px;right:6px;bottom:6px;}
+    #btn-block{width:50px;height:50px;right:80px;bottom:12px;}
+    #btn-jump{width:50px;height:50px;right:70px;bottom:74px;}
+    #btn-roll{width:46px;height:46px;right:16px;bottom:82px;}
+    #btn-interact{width:52px;height:52px;right:96px;bottom:60px;}
+    #btn-cast{width:44px;height:44px;right:4px;bottom:86px;}
+    #btn-crouch{width:40px;height:40px;right:56px;bottom:132px;}
+  }
 </style>
 </head>
 <body>
@@ -4865,11 +4925,13 @@ const GAME = {
     </div>`;
     /* preview 3D */
     const pv = document.getElementById('char-preview');
+    const PW = G.isMobile ? 150 : 220, PH = G.isMobile ? 210 : 300;
+    pv.style.flex = '0 0 ' + PW + 'px'; pv.style.height = PH + 'px';
     const pr = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    pr.setSize(220, 300); pr.setPixelRatio(Math.min(devicePixelRatio, 2));
+    pr.setSize(PW, PH); pr.setPixelRatio(Math.min(devicePixelRatio, 2));
     pv.appendChild(pr.domElement);
     const ps = new THREE.Scene();
-    const pc = new THREE.PerspectiveCamera(40, 220 / 300, 0.1, 20);
+    const pc = new THREE.PerspectiveCamera(40, PW / PH, 0.1, 20);
     pc.position.set(0, 1.5, 4.2); pc.lookAt(0, 1.1, 0);
     ps.add(new THREE.HemisphereLight(0xffffff, 0x444455, 1.1));
     const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(2, 4, 3); ps.add(dl);

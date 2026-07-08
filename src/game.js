@@ -75,11 +75,13 @@ const GAME = {
     </div>`;
     /* preview 3D */
     const pv = document.getElementById('char-preview');
+    const PW = G.isMobile ? 150 : 220, PH = G.isMobile ? 210 : 300;
+    pv.style.flex = '0 0 ' + PW + 'px'; pv.style.height = PH + 'px';
     const pr = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    pr.setSize(220, 300); pr.setPixelRatio(Math.min(devicePixelRatio, 2));
+    pr.setSize(PW, PH); pr.setPixelRatio(Math.min(devicePixelRatio, 2));
     pv.appendChild(pr.domElement);
     const ps = new THREE.Scene();
-    const pc = new THREE.PerspectiveCamera(40, 220 / 300, 0.1, 20);
+    const pc = new THREE.PerspectiveCamera(40, PW / PH, 0.1, 20);
     pc.position.set(0, 1.5, 4.2); pc.lookAt(0, 1.1, 0);
     ps.add(new THREE.HemisphereLight(0xffffff, 0x444455, 1.1));
     const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(2, 4, 3); ps.add(dl);
