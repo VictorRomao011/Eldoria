@@ -4,7 +4,14 @@ Um RPG de mundo aberto 3D que roda **100% offline no navegador** (PC e Android),
 instalação e sem dependências externas. Construído com Three.js (r128), HTML, CSS e
 JavaScript puro. Áudio e modelos 3D são gerados proceduralmente — zero assets externos.
 
-## ▶️ Como jogar
+## 🌐 Jogar online (GitHub Pages)
+
+**▶️ [Clique aqui para jogar agora](https://victorromao011.github.io/Eldoria/)**
+
+Roda direto no navegador (PC e celular), sem baixar nada. Também dá para abrir a versão
+de arquivo único em <https://victorromao011.github.io/Eldoria/eldoria-standalone.html>.
+
+## ▶️ Como jogar (localmente)
 
 **Opção A — arquivo único (mais simples):**
 Abra **`eldoria-standalone.html`** no navegador. É só isso. Tudo está embutido nesse
