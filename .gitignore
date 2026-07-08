@@ -1,0 +1,10 @@
+# Artefatos do smoke test headless (não versionados — ver CLAUDE.md)
+node_modules/
+package.json
+package-lock.json
+smoke.js
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log
